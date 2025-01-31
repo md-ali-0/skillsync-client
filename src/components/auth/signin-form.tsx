@@ -42,7 +42,9 @@ export default function SigninForm() {
     const response = await signin(data)
 
     if (response.success) {
-      localStorage.setItem("token", response?.data)
+      console.log(response);
+      
+      localStorage.setItem("token", response?.data?.accessToken)
       const destination = searchParams.get("redirect") || "/"
       router.replace(decodeURIComponent(destination))
       toast.success("User Logged In Successfully")

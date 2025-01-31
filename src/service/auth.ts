@@ -46,7 +46,7 @@ export async function signin(formData: FormValues) {
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
         if (result?.success)
-            cookies().set("session", result?.data, {
+            cookies().set("session", result?.data?.accessToken, {
                 httpOnly: true,
                 secure: true,
                 path: "/",

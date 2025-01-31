@@ -1,15 +1,42 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import config from "@/config";
+import { useSession } from "@/provider/session-provider";
+import { useGetMeQuery } from "@/redux/features/user/userApi";
+import { signout } from "@/service/auth";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Skeleton } from "../ui/skeleton";
+import AvatarDropdown from "./avater-dropdown";
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
+    const handleDropdownToggle = () => setIsDropdownOpen(!isDropdownOpen);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const router = useRouter();
+    const { session, setIsLoading } = useSession();
+    const { data: user, isLoading } = useGetMeQuery(undefined);
+    console.log(user);
+    
+    const handleLogout = async () => {
+        try {
+            setIsLoading(true);
+            localStorage.removeItem("token");
+            await signout();
+            setIsLoading(false);
+            toast.success("Logout Successfully");
+            router.push("/");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
 
     const navItems = [
         { name: "Home", href: "/" },
@@ -115,13 +142,71 @@ export default function Header() {
                     </div>
                 </div>
                 <div className="border-l h-6 max-lg:hidden" />
+
                 <div className="flex items-center ml-auto space-x-4">
-                    <Button variant="outline" asChild className="hidden sm:block">
-                        <Link href="/auth/signin">Log in</Link>
-                    </Button>
-                    <Button asChild>
-                        <Link href="/auth/signup">Start free trial</Link>
-                    </Button>
+                    {session?.isAuth ? (
+                        <div className="relative">
+                            <div
+                                onClick={handleDropdownToggle}
+                                className="cursor-pointer"
+                            >
+                                <div className="group flex gap-2">
+                                    {isLoading ? (
+                                        <div className="flex items-center space-x-4">
+                                            <Skeleton className="size-10 rounded-full" />
+                                            <div className="hidden sm:block space-y-2">
+                                                <Skeleton className="h-4 w-[120px]" />
+                                                <Skeleton className="h-4 w-[80px]" />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <Avatar>
+                                                <AvatarImage
+                                                    src={`${config.host}/${user?.avatar}`}
+                                                    alt={user?.name}
+                                                    className="object-cover rounded-full size-10  border border-primary p-1"
+                                                />
+                                                <AvatarFallback>
+                                                    {user?.name.split("")[0]}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="hidden sm:block">
+                                                <h3 className="font-medium capitalize">
+                                                    {user?.name}
+                                                </h3>
+                                                <span className="block -mt-1 text-sm text-gray-400 capitalize">
+                                                    {session?.role}
+                                                </span>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {isDropdownOpen && (
+                                <AvatarDropdown
+                                    handleLogout={handleLogout}
+                                    setIsDropdownOpen={setIsDropdownOpen}
+                                />
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex gap-2.5">
+                            <Button
+                                variant="outline"
+                                asChild
+                                className="hidden sm:block"
+                            >
+                                <Link href="/auth/signin">Log in</Link>
+                            </Button>
+                            <Button asChild>
+                                <Link href="/auth/signup">
+                                    Start free trial
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
                     <button onClick={toggleMenu} className="lg:hidden">
                         <Menu className="w-7 h-7" />
                     </button>

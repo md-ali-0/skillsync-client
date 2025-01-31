@@ -11,6 +11,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSignUpUserMutation } from "@/redux/features/auth/authApi";
 import { SignupSchema } from "@/schema/signup.schema";
 import type { ErrorResponse } from "@/types";
@@ -28,6 +29,9 @@ const formSchema = SignupSchema.extend({
     termsAccepted: z.boolean().refine((val) => val === true, {
         message: "You must accept the terms and conditions",
     }),
+    role: z.enum(["TEACHER", "LEARNER"], {
+        required_error: "You must select a role",
+    }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -44,6 +48,7 @@ export default function SignupForm() {
             email: "",
             password: "",
             termsAccepted: false,
+            role: undefined,
         },
     });
 
@@ -132,6 +137,40 @@ export default function SignupForm() {
                                         )}
                                     </Button>
                                 </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col sm:flex-row items-center space-x-3 space-y-3 sm:space-y-0">
+                            <FormLabel>Are you ?</FormLabel>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex space-x-3"
+                                >
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="TEACHER" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal cursor-pointer">
+                                            Teacher
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="LEARNER" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal cursor-pointer">
+                                            Learner
+                                        </FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
