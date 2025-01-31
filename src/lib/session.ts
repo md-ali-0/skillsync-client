@@ -7,7 +7,7 @@ import "server-only";
 
 export interface DecryptedSession {
     user: number | null;
-    role: "user" | "superAdmin" | "admin" | "guest";
+    role: "ADMIN" | "LEARNER" | "TEACHER" | "GUEST";
     iat: number;
     exp: number;
 }
@@ -35,5 +35,5 @@ export async function getSession(): Promise<TSession> {
         }
     }
 
-    return { isAuth: false, user: null, role: "guest" };
+    return { isAuth: false, user: null, role: "GUEST" };
 }

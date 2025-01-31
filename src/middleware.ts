@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 import { decrypt, DecryptedSession } from "./lib/session";
 
 const roleBasedAccess: { [key: string]: string[] } = {
-    "/dashboard": ["admin"],
+    "/admin": ["ADMIN"],
+    "/dashboard": ["ADMIN", "TEACHER", "LEARNER"],
 };
 
 export async function middleware(req: NextRequest) {
@@ -13,7 +14,7 @@ export async function middleware(req: NextRequest) {
 
     let session: DecryptedSession | undefined = {
         user: null,
-        role: "guest",
+        role: "GUEST",
         iat: 0,
         exp: 0,
     };
@@ -49,7 +50,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*"],
+    matcher: ["/dashboard/:path*", "/admin/:path*"],
 };
 
 // The middleware function is responsible for checking the session cookie and role-based access. If the user is not authenticated, it will redirect to the login page. If the user is authenticated but doesn't have the required role, it will redirect to the home page.

@@ -1,5 +1,6 @@
 import Footer from "@/components/shared/footer";
 import Header from "@/components/shared/header";
+
 import { Toaster } from "@/components/ui/sonner";
 import ReduxProvider from "@/provider/redux-provider";
 import { SessionProvider } from "@/provider/session-provider";

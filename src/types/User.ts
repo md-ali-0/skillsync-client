@@ -1,10 +1,11 @@
-enum Role {
+export enum Role {
     TEACHER,
     LEARNER,
-    ADMIN
+    ADMIN,
+    GUEST
 }
 
-enum UserStatus {
+export enum UserStatus {
     ACTIVE,
     BLOCKED,
 }
